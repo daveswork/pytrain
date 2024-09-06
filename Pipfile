@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 simple-term-menu = "*"
+gtfs-realtime-bindings = "*"
+requests = "*"
 
 [dev-packages]
 
