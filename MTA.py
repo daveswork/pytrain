@@ -12,10 +12,16 @@ def convert_timestamp(timestamp):
     return datetime.fromtimestamp(timestamp)
 
 def next_train_arrival(station, direction):
-    result = []
+    next_train = []
+    arrival = []
     for train in get_all_trains():
         if train["direction"] == direction:
-            print(train['trip_id'])
+            for stop in train["next_stops_array"]:
+                if stop["stop_id"][:-1] == station:
+                    my_station_arrival_time = convert_timestamp(stop["arrival_time"]) - ct
+                    next_train.append(train)
+                    arrival.append(my_station_arrival_time)
+    return f'A {next_train[0]["direction"]} bound {next_train[0]["route_id"]} train will arrive at {station} in {arrival[0]}'       
 
 def get_all_trains():
     all_trains = []
@@ -71,4 +77,5 @@ test_time_2 = 1725742387
 
 # time_test = convert_timestamp(test_time_2) - convert_timestamp(test_time_1)
 # print(time_test)
-next_train_arrival("G26", "N")
+train_test = next_train_arrival("G24", "N")
+print(train_test)
