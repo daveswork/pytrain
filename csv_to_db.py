@@ -125,31 +125,29 @@ def mta_subway_station_query(stop_id):
     """
     station = cursor.execute(sql, [gtfs_stop_id]).fetchone()
     connection.close()
+    if station is None:
+        return station
     return dict(station)
 
 def mta_select_stop():
+    """
+    Select a stop prompt and selection menu. 
+    Returns a dictionary containing the station id and stop name.
+    eg:
+    {'station_id': 'G29', 'stop_name': 'Metropolitan Av'}
+    """
     connection = sqlite3.connect("mtainfo.db")
-    # connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
     sql = """
         SELECT stop_name, gtfs_stop_id FROM mtainfo WHERE daytime_routes LIKE "%G%"
         """
     stations = cursor.execute(sql).fetchall()
-    print(stations)
     options = [station[0] for station in stations]
     connection.close()
-
-    print(options)
     terminal_menu = TerminalMenu(options)
     menu_entry_index = terminal_menu.show()
-    print(f'You have selected  {options[menu_entry_index]}')
-    print(f'The gtfs station id is {stations[menu_entry_index][1]}')
+    return {"station_id": stations[menu_entry_index][1], "stop_name": options[menu_entry_index]}
     
 
 if __name__ == "__main__":
-    # subway_station_csv_to_db("MTA_Subway_Stations_20240906.csv")
-
-    station = mta_subway_station_query("H19S")
-    print(station)
-
-    # mta_select_stop()
+    pass
