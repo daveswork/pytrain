@@ -24,13 +24,20 @@ def trip_id_convert(trip_id):
 def next_train_arrival(station, direction):
     next_train = []
     arrival = []
+    next_train_dict = {
+        "train" : {},
+        "station_arrival_time" : ""
+    }
     for train in get_all_trains():
         if train["direction"] == direction:
+            # next_train = {}
+            min_time = 100
             for stop in train["next_stops_array"]:
                 if stop["stop_id"][:-1] == station:
-                    # print(trip_id_convert(train["trip_id"]))
-                    # print(train["start_time"])
-                    # print(convert_timestamp(stop["arrival_time"]))
+                    
+                    # print(train["trip_id"])
+                    # print(stop["arrival_time"])
+                    # print(stop["stop_id"])
                     my_station_arrival_time = convert_timestamp(stop["arrival_time"]) - ct
                     next_train.append(train)
                     arrival.append(my_station_arrival_time)
@@ -47,7 +54,6 @@ def get_all_trains():
             next_arrival = entity.trip_update.stop_time_update[0].arrival.time
             next_departure = entity.trip_update.stop_time_update[0].departure.time
             next_station = entity.trip_update.stop_time_update[0].stop_id
-            # print(next_arrival)
             all_stops = []
             for stop in entity.trip_update.stop_time_update:
                 arrival_time = stop.arrival.time
@@ -74,3 +80,11 @@ def get_all_trains():
 
 train_test = next_train_arrival("G36", "S")
 print(train_test)
+
+# test_time_1 = 1725814530
+# test_time_2 = 1725815130
+
+# print(convert_timestamp(test_time_1))
+# print(convert_timestamp(test_time_2))
+# print(convert_timestamp(test_time_2 - test_time_1))
+# print(convert_timestamp(test_time_2)-convert_timestamp(test_time_1))
