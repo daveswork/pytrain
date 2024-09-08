@@ -11,6 +11,16 @@ ct = datetime.now()
 def convert_timestamp(timestamp):
     return datetime.fromtimestamp(timestamp)
 
+def trip_id_convert(trip_id):
+    return f'{datetime.fromtimestamp(int(trip_id[:-8]))} {trip_id[7:-1]}'
+
+# def get_train_arrival_time(station):
+#     for stop in train["next_stops_array"]:
+#         if stop["stop_id"][:-1] == station:
+#             my_station_arrival_time = convert_timestamp(stop["arrival_time"]) - ct
+#             next_train.append(train)
+#             arrival.append(my_station_arrival_time)
+
 def next_train_arrival(station, direction):
     next_train = []
     arrival = []
@@ -18,10 +28,14 @@ def next_train_arrival(station, direction):
         if train["direction"] == direction:
             for stop in train["next_stops_array"]:
                 if stop["stop_id"][:-1] == station:
+                    # print(trip_id_convert(train["trip_id"]))
+                    # print(train["start_time"])
+                    # print(convert_timestamp(stop["arrival_time"]))
                     my_station_arrival_time = convert_timestamp(stop["arrival_time"]) - ct
                     next_train.append(train)
                     arrival.append(my_station_arrival_time)
-    return f'A {next_train[0]["direction"]} bound {next_train[0]["route_id"]} train will arrive at {station} in {arrival[0]}'       
+    return f'A {next_train[0]["direction"]} bound {next_train[0]["route_id"]} train will arrive at {station} in {arrival[0]}'
+    
 
 def get_all_trains():
     all_trains = []
@@ -56,26 +70,7 @@ def get_all_trains():
             all_trains.append(train_dict)
     return all_trains
 
+# next_train_arrival("G36", "S")
 
-# for train in all_trains:
-#     if train["direction"] == "N":
-#         print(train)
-    
-# print(feed)
-# print(all_trains[0]["next_stops_array"])
-# for stop in all_trains[3]["next_stops_array"]:
-#     print("ID", stop["stop_id"])
-#     print("TIME", convert_timestamp(stop["arrival_time"]))
-   
-
-test_time_1 = 1725741847
-test_time_2 = 1725742387
-
-# print(type(ct))
-# print(convert_timestamp(test_time_1))
-# print(convert_timestamp(test_time_2))
-
-# time_test = convert_timestamp(test_time_2) - convert_timestamp(test_time_1)
-# print(time_test)
-train_test = next_train_arrival("G24", "N")
+train_test = next_train_arrival("G36", "S")
 print(train_test)
