@@ -73,6 +73,11 @@ def get_arrival_time_for_destination(train_obj, end_station):
             }
     return new_train_obj
     
+def get_stop_sequence():
+    stops = []
+    for stop in feed.entity[-2].trip_update.stop_time_update:
+        stops.append(stop.stop_id)
+    return stops
 
 def get_arrival_time_for_station(train, station):
     for stop in train["next_stops_array"]:
@@ -113,23 +118,6 @@ def get_all_trains():
 
 if __name__ == "__main__":
     train_test = next_train_arrival("G36", "S")
-    # pprint.pprint(train_test)
+  
 
-    arrival_test = get_arrival_time_for_destination(train_test, "F24")
-    pprint.pprint(arrival_test)
-    print("station arrival", convert_timestamp(arrival_test["arrival_time"]))
-    print("destination_arrival", convert_timestamp(arrival_test["destination_arrival_time"]))
-
-    # print(get_direction(train_test))
-
-
-    # print(train_test["train"]["trip_id"])
-    # print(convert_timestamp(train_test["arrival_time"]))
-    # print(convert_seconds(train_test["arriving_in"]))
-
-    # for entity in feed.entity:
-    #     print(entity.vehicle.trip.trip_id)
-    #     for stop in entity.trip_update.stop_time_update:
-    #         print(stop.stop_id)
-
-    # print(feed)
+    print(get_stop_sequence())
