@@ -56,6 +56,13 @@ def next_train_arrival(station, direction):
         "arrival_time" : best_time,
         "arriving_in" : time_difference(ct_epoch, best_time)
     }
+
+def station_to_station_time(start_station, end_station):
+    trip_time_dict = {}
+    direction = filter_stations(start_station)
+    return direction
+    pass
+
         
 def get_arrival_time_for_station(train, station):
     for stop in train["next_stops_array"]:
@@ -95,10 +102,19 @@ def get_all_trains():
 
 
 if __name__ == "__main__":
-    train_test = next_train_arrival("G36", "S")
+    # train_test = next_train_arrival("G36", "S")
     # pprint.pprint(train_test)
-    print(train_test["train"]["trip_id"])
-    print(convert_timestamp(train_test["arrival_time"]))
-    print(convert_seconds(train_test["arriving_in"]))
+
+    station_2_station_test = station_to_station_time("G32S", "F21S")
+    print(station_2_station_test)
+
+    # print(train_test["train"]["trip_id"])
+    # print(convert_timestamp(train_test["arrival_time"]))
+    # print(convert_seconds(train_test["arriving_in"]))
+
+    # for entity in feed.entity:
+    #     print(entity.vehicle.trip.trip_id)
+    #     for stop in entity.trip_update.stop_time_update:
+    #         print(stop.stop_id)
 
     # print(feed)
