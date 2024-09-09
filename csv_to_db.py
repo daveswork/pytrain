@@ -136,11 +136,11 @@ def get_stations_id_and_name():
     connection = sqlite3.connect("mtainfo.db")
     cursor = connection.cursor()
     sql = """
-        SELECT stop_name, gtfs_stop_id FROM mtainfo WHERE daytime_routes LIKE "%G%"
+        SELECT stop_name, stop_id FROM groute
         """
     stations = cursor.execute(sql).fetchall()
     connection.close()
-    return stations
+    return stations[::-1]
 
 
 
