@@ -43,14 +43,13 @@ if add_stop.upper() == "Y":
     arriving_time = arriving_train['arrival_time']
     destination_time = MTA.get_arrival_time_for_destination(arriving_train, end_point['station_id'])['destination_arrival_time']
     print(f'times to compare {arriving_time}, {destination_time}')
+    print(f"You train from {starting_point['stop_name']} will depart at {datetime.datetime.fromtimestamp(arriving_time).strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"To {end_point['stop_name']} and will arrive at {datetime.datetime.fromtimestamp(destination_time).strftime('%Y-%m-%d %H:%M:%S')}")
     trip_time = destination_time - arriving_time
-    print(mta_output_formatting.convert_seconds(trip_time))
+    print(f'Total trip time is expected to be: {mta_output_formatting.convert_seconds(trip_time)}')
 else:
     print(f'You selected: {starting_point["stop_name"]}')
     print(f'Going: {direction}')
     arriving_train = MTA.next_train_arrival(starting_point['station_id'], direction)
-    # pprint.pprint(arriving_train)
-    # added_arrival_time = MTA.get_arrival_time_for_destination(arriving_train,starting_point["station_id"] )
-    # arrival_time = added_arrival_time["destination_arrival_time"]
     print(f"Your train is arriving at {datetime.datetime.fromtimestamp(arriving_train['arrival_time']).strftime('%Y-%m-%d %H:%M:%S')}")
     
