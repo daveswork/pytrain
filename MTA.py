@@ -60,7 +60,7 @@ def next_train_arrival(station, direction):
         "arriving_in" : time_difference(ct_epoch, best_time)
     }
 
-def get_arrival_time(train_obj, end_station):
+def get_arrival_time_for_destination(train_obj, end_station):
     new_train_obj = {
         **train_obj,
         "destination_arrival_time" : 0
@@ -115,8 +115,10 @@ if __name__ == "__main__":
     train_test = next_train_arrival("G36", "S")
     # pprint.pprint(train_test)
 
-    arrival_test = get_arrival_time(train_test, "F24")
+    arrival_test = get_arrival_time_for_destination(train_test, "F24")
     pprint.pprint(arrival_test)
+    print("station arrival", convert_timestamp(arrival_test["arrival_time"]))
+    print("destination_arrival", convert_timestamp(arrival_test["destination_arrival_time"]))
 
     # print(get_direction(train_test))
 
