@@ -2,6 +2,7 @@ import MTA
 import csv_to_db
 import datetime
 from simple_term_menu import TerminalMenu
+import pprint
 
 
 
@@ -29,11 +30,19 @@ end_point = None
 print(f'You selected: {starting_point["stop_name"]}')
 direction= select_a_direction()
 add_stop = input("Do you want to add a stop? Y/n: ")
+
+# 1725907267
+
 if add_stop.upper() == "Y":
     end_point = select_a_stop(stations)
     print(f'Your starting station is : {starting_point["stop_name"]}')
     print(f'Your destination station is: {end_point["stop_name"]}')
 else:
     print(f'You selected: {starting_point["stop_name"]}')
-    arriving_at = MTA.next_train_arrival(starting_point['station_id'], "S")
-    print(arriving_at)
+    print(f'Going: {direction}')
+    arriving_train = MTA.next_train_arrival(starting_point['station_id'], "S")
+    # pprint.pprint(arriving_train)
+    added_arrival_time = MTA.get_arrival_time_for_destination(arriving_train,starting_point["station_id"] )
+    arrival_time = added_arrival_time["destination_arrival_time"]
+    print(f"Your train is arriving at {datetime.datetime.fromtimestamp(arrival_time).strftime('%Y-%m-%d %H:%M:%S')}")
+    
