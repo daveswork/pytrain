@@ -131,7 +131,31 @@ def mta_subway_station_query(stop_id):
 
 def get_stations_id_and_name():
     """
+    Input: None
     Returns a list of tuples with station names and ids
+    Output:
+    [('Court Sq', 'G22'),
+    ('21 St', 'G24'),
+    ('Greenpoint Av', 'G26'),
+    ('Nassau Av', 'G28'),
+    ('Metropolitan Av', 'G29'),
+    ('Broadway', 'G30'),
+    ('Flushing Av', 'G31'),
+    ('Myrtle-Willoughby Avs', 'G32'),
+    ('Bedford-Nostrand Avs', 'G33'),
+    ('Classon Av', 'G34'),
+    ('Clinton-Washington Avs', 'G35'),
+    ('Fulton St', 'G36'),
+    ('Hoyt-Schermerhorn Sts', 'A42'),
+    ('Bergen St', 'F20'),
+    ('Carroll St', 'F21'),
+    ('Smith-9 Sts', 'F22'),
+    ('4 Av-9 St', 'F23'),
+    ('7 Av', 'F24'),
+    ('15 St-Prospect Park', 'F25'),
+    ('Fort Hamilton Pkwy', 'F26'),
+    ('Church Av', 'F27')]
+
     """
     connection = sqlite3.connect("mtainfo.db")
     cursor = connection.cursor()
