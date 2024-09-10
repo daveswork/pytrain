@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from mta_output_formatting import time_difference, convert_seconds
 import pprint
 import csv_to_db 
+import static_travel_times
 
 # this is the API request that is used to get realtime train data in GTFS format.
 # the url endpoint specifies an individual train line.
@@ -133,6 +134,25 @@ def get_stop_to_stop_times(direction):
         i += 1
     return stop_to_stop_times
 
+def is_train_slow(train_obj):
+    trip_id = train_obj["train"]["trip_id"]
+    last_station_id = train_obj["train"]["next_stops_array"][0]["stop_id"]
+    last_station_arrival = train_obj["train"]["next_stops_array"][0]["arrival_time"]
+    next_station_id = train_obj["train"]["next_stops_array"][1]["stop_id"]
+    next_station_arrival = train_obj["train"]["next_stops_array"][1]["arrival_time"]
+    train_dict = {
+        "trip_id" : trip_id,
+        "origin" : last_station_id,
+        "destination" : next_station_id,
+        "trip_time" : time_difference(last_station_arrival, next_station_arrival)
+    }
+    print(train_dict)
+    print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
+    if static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1])["time"] < train_dict["trip_time"]:
+        print("your train is slow")
+    else:
+        print("train on time")
+
 # this function takes the GTFS feed from the request and returns a list of train objects that will be used in all of our functions.
 # each train is called an entity, and if that entity has a 'trip_update" key and an array of stops, then it will contain the information that our program uses.
 # entities that don't contain this info will be ignored.
@@ -173,6 +193,7 @@ if __name__ == "__main__":
     # print(feed.entity[-2])
    
 
-    for stop in get_stop_to_stop_times("S"):
-        print(stop)
+    is_train_slow(next_train_arrival("G36", "S"))
 
+    # query_test = static_travel_times.query_static_time_table("G32", "N")
+    # print(query_test)
