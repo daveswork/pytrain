@@ -6,27 +6,33 @@ import pprint
 
 # this is the API request that is used to get realtime train data in GTFS format.
 # the url endpoint specifies an individual train line.
+# feed contains the info we use in the program
 feed = gtfs_realtime_pb2.FeedMessage()
 response = requests.get('https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g')
 feed.ParseFromString(response.content)
 
+# current time
 ct = datetime.now()
 
+# convert 10 digit POSIX timestamp used in feed to readable format
 def convert_timestamp(timestamp):
     return datetime.fromtimestamp(timestamp)
 
+# 
 def convert_seconds(seconds):
     return timedelta(seconds = seconds)
 
 # returns a list of all trains traveling either N or S
 def filter_direction(direction):
     filtered_trains = []
+    # loops throught the feed and appends trains to filtered_trains list if they are going in the specified direction 
     for train in get_all_trains():
         if train["direction"] == direction:
             filtered_trains.append(train)
     return filtered_trains
 
-# loops through each train's (filtered by direction) array of stops and returns a list of trains that will stop at the specified station
+# takes a list of train objs and a station as args
+# loops through each train's array of stops and returns a list of trains that will stop at the specified station
 def filter_stations(station, train_list):
     filtered_stations = []
     for train in train_list:
@@ -36,7 +42,7 @@ def filter_stations(station, train_list):
     return filtered_stations
 
 # MAIN FUNCTION 
-# Returns a dict "best_train" that contains info on the next train arriving at the specified station and direction of travel
+# Returns a dict that contains info on the next train arriving at the specified station. Takes station and direction as args.
 def next_train_arrival(station, direction):
     direction_bound_trains = []
     ct_epoch = int(ct.timestamp())
@@ -44,10 +50,10 @@ def next_train_arrival(station, direction):
     best_time = 0
     best_train = {}
 
-# loop through feed.entity (all trips) and return a list of trains traveling in the selected direction (direction_bound_trains)
+# loop through all_trains list returned from get_trains_function and appends trains traveling in the selected direction to direction_bound_trains
     for train in filter_direction(direction):
         direction_bound_trains.append(train)
-# next_train_list contains every train that will stop at the chosen station and is traveling in the chosen direction
+# next_train_list contains every train that will stop at the chosen station. It is created using the list of direction bound trains that has been filtered for direction.
     next_train_list = filter_stations(station, direction_bound_trains)
 # loop through each train in next train list, find the train with arrival time closest to current time, and return that train, the arrival time, and the seconds to arrival, in dict (best_train)
     for train in next_train_list:
@@ -98,7 +104,7 @@ def get_stop_sequence():
         stops.append(stop.stop_id)
     return stops
 
-# this function takes the GTFS feed from the request and creates train objects that will be used in all of our functions.
+# this function takes the GTFS feed from the request and returns a list of train objects that will be used in all of our functions.
 # each train is called an entity, and if that entity has a 'trip_update" key and an array of stops, then it will contain the information that our program uses.
 # entities that don't contain this info will be ignored.
 def get_all_trains():
@@ -135,4 +141,10 @@ def get_all_trains():
 if __name__ == "__main__":
     train_test = next_train_arrival("G36", "S")
 
-    print(feed)
+    # print(feed)
+
+    for entity in feed.entity:
+        if entity.HasField("vehicle") and entity.vehicle.trip.trip_id == "080350_G..N14R":
+            print("V", entity)
+        elif entity.HasField("trip_update")  and len(entity.trip_update.stop_time_update) > 0 and entity.trip_update.trip.trip_id == "080350_G..N14R":
+            print(entity)
