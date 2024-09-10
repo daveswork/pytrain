@@ -8,6 +8,8 @@ feed = gtfs_realtime_pb2.FeedMessage()
 response = requests.get('https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g')
 feed.ParseFromString(response.content)
 
+
+
 ct = datetime.now()
 
 def convert_timestamp(timestamp):
@@ -60,6 +62,11 @@ def next_train_arrival(station, direction):
         "arriving_in" : time_difference(ct_epoch, best_time)
     }
 
+def get_arrival_time_for_station(train, station):
+    for stop in train["next_stops_array"]:
+        if stop["stop_id"][:-1] == station:
+            return stop["arrival_time"]
+
 def get_arrival_time_for_destination(train_obj, end_station):
     new_train_obj = {
         **train_obj,
@@ -78,11 +85,6 @@ def get_stop_sequence():
     for stop in feed.entity[-2].trip_update.stop_time_update:
         stops.append(stop.stop_id)
     return stops
-
-def get_arrival_time_for_station(train, station):
-    for stop in train["next_stops_array"]:
-        if stop["stop_id"][:-1] == station:
-            return stop["arrival_time"]
 
 def get_all_trains():
     all_trains = []
@@ -115,9 +117,13 @@ def get_all_trains():
             all_trains.append(train_dict)
     return all_trains
 
+def get_service_alerts():
+    response = requests.get('https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fall-alerts')
+    print(response)
 
 if __name__ == "__main__":
     train_test = next_train_arrival("G36", "S")
-  
+    # print(train_test)
 
-    print(get_stop_sequence())
+# print(feed.entity[2])
+    
