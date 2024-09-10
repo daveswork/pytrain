@@ -123,8 +123,8 @@ def get_stop_to_stop_times():
     i = 0
     while i < len(stop_times) - 1:
         stop_time_dict = {
-            "origin" : csv_to_db.mta_subway_station_query(stop_times[i][0])["stop_name"],
-            "destination" : csv_to_db.mta_subway_station_query(stop_times[i + 1][0])["stop_name"],
+            "origin" : stop_times[i][0][:-1],
+            "destination" : stop_times[i + 1][0][:-1],
             "trip_time" : time_difference(stop_times[i][1], stop_times[i+1][1]) 
         }
         stop_to_stop_times.append(stop_time_dict)
