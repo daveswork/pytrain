@@ -123,7 +123,3 @@ def get_service_alerts():
 
 if __name__ == "__main__":
     train_test = next_train_arrival("G36", "S")
-    # print(train_test)
-
-# print(feed.entity[2])
-    
