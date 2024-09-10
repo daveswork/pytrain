@@ -112,15 +112,17 @@ def get_vehicle_by_id(trip_id):
         elif entity.HasField("trip_update")  and len(entity.trip_update.stop_time_update) > 0 and entity.trip_update.trip.trip_id == trip_id:
             print(entity)
 
-def get_stop_to_stop_times():
+def get_stop_to_stop_times(direction):
     stop_times = []
     stop_to_stop_times = []
-    stop_to_stop_times.append({feed.entity[-2].trip_update.trip.trip_id})
+    # stop_to_stop_times.append({feed.entity[-2].trip_update.trip.trip_id})
     # print(feed.entity[-2])
-    for stop_time in feed.entity[-2].trip_update.stop_time_update:
-        stop_and_time = (stop_time.stop_id, stop_time.arrival.time)
+    for stop_time in filter_direction(direction)[-1]["next_stops_array"]:
+        # print(stop_time)
+        stop_and_time = (stop_time["stop_id"], stop_time["arrival_time"])
         stop_times.append(stop_and_time)
     i = 0
+    # print(stop_times)
     while i < len(stop_times) - 1:
         stop_time_dict = {
             "origin" : stop_times[i][0][:-1],
@@ -171,6 +173,6 @@ if __name__ == "__main__":
     # print(feed.entity[-2])
    
 
-    for stop in get_stop_to_stop_times():
+    for stop in get_stop_to_stop_times("S"):
         print(stop)
 
