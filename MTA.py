@@ -3,6 +3,7 @@ import requests
 from datetime import datetime, timedelta
 from mta_output_formatting import time_difference, convert_seconds
 import pprint
+import csv_to_db 
 
 # this is the API request that is used to get realtime train data in GTFS format.
 # the url endpoint specifies an individual train line.
@@ -104,6 +105,32 @@ def get_stop_sequence():
         stops.append(stop.stop_id)
     return stops
 
+def get_vehicle_by_id(trip_id):
+    for entity in feed.entity:
+        if entity.HasField("vehicle") and entity.vehicle.trip.trip_id == trip_id:
+            print("V", entity)
+        elif entity.HasField("trip_update")  and len(entity.trip_update.stop_time_update) > 0 and entity.trip_update.trip.trip_id == trip_id:
+            print(entity)
+
+def get_stop_to_stop_times():
+    stop_times = []
+    stop_to_stop_times = []
+    stop_to_stop_times.append({feed.entity[-2].trip_update.trip.trip_id})
+    # print(feed.entity[-2])
+    for stop_time in feed.entity[-2].trip_update.stop_time_update:
+        stop_and_time = (stop_time.stop_id, stop_time.arrival.time)
+        stop_times.append(stop_and_time)
+    i = 0
+    while i < len(stop_times) - 1:
+        stop_time_dict = {
+            "origin" : csv_to_db.mta_subway_station_query(stop_times[i][0])["stop_name"],
+            "destination" : csv_to_db.mta_subway_station_query(stop_times[i + 1][0])["stop_name"],
+            "trip_time" : time_difference(stop_times[i][1], stop_times[i+1][1]) 
+        }
+        stop_to_stop_times.append(stop_time_dict)
+        i += 1
+    return stop_to_stop_times
+
 # this function takes the GTFS feed from the request and returns a list of train objects that will be used in all of our functions.
 # each train is called an entity, and if that entity has a 'trip_update" key and an array of stops, then it will contain the information that our program uses.
 # entities that don't contain this info will be ignored.
@@ -141,10 +168,9 @@ def get_all_trains():
 if __name__ == "__main__":
     train_test = next_train_arrival("G36", "S")
 
-    # print(feed)
+    # print(feed.entity[-2])
+   
 
-    for entity in feed.entity:
-        if entity.HasField("vehicle") and entity.vehicle.trip.trip_id == "080350_G..N14R":
-            print("V", entity)
-        elif entity.HasField("trip_update")  and len(entity.trip_update.stop_time_update) > 0 and entity.trip_update.trip.trip_id == "080350_G..N14R":
-            print(entity)
+    for stop in get_stop_to_stop_times():
+        print(stop)
+

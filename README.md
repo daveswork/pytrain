@@ -13,5 +13,7 @@ In the terminal type...
 
 run ``` python ui.py ```
 
+## INSTRUCTIONS
+ ![pytrain-usage](./pytrain-4.gif)
 
 
