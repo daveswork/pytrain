@@ -1,5 +1,5 @@
 import sqlite3
-
+import MTA
 
 def build_static_travel_time_table_north():
     connection = sqlite3.connect("mtainfo.db")
@@ -32,7 +32,7 @@ def build_static_travel_time_table_south():
     connection.close()
 
 
-def populate_static_travel_time(timeslist):
+def populate_static_travel_time(timeslist, direction):
     """
     Takes a list genertated from MTA.get_stop_to_stop_times()
     [{'103350_G..S14R'},
@@ -45,27 +45,26 @@ def populate_static_travel_time(timeslist):
     Expects the first element to be a trip id.
     Populuates the respective table based on the direction in the trip id.
     """
-    trip_id = next(iter(timeslist[0]))
-    direction = trip_id[-4]
+
     connection = sqlite3.connect("mtainfo.db")
     cursor = connection.cursor()
 
     populate_north_table = """
     INSERT INTO origin_destination_times_north(origin_id, destination_id, time)
-    VALUES(? ? ?)
+    VALUES(?,?,?)
     """
 
     populate_south_table = """
     INSERT INTO origin_destination_times_south(origin_id, destination_id, time)
-    VALUES(? ? ?)
+    VALUES(?,?,?)
     """
 
-    for i in range(1,len(timeslist)):
+    for timedata in timeslist:
         if direction == "N":
-            cursor.execute(populate_north_table, [timeslist[i]['origin'], timeslist[i]['destination'], timeslist[i]['trip_time'] ])
+            cursor.execute(populate_north_table, [timedata['origin'], timedata['destination'], timedata['trip_time'] ])
             connection.commit()
         elif direction == "S":
-            cursor.execute(populate_south_table, [timeslist[i]['origin'], timeslist[i]['destination'], timeslist[i]['trip_time'] ])
+            cursor.execute(populate_south_table, [timedata['origin'], timedata['destination'], timedata['trip_time'] ])
             connection.commit()
 
     connection.close()
@@ -73,4 +72,6 @@ def populate_static_travel_time(timeslist):
 if __name__ == "__main__":
     # build_static_travel_time_table_north()
     # build_static_travel_time_table_south()
+    # populate_static_travel_time(MTA.get_stop_to_stop_times("S"), "S")
+
     pass
