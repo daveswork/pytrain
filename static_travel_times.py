@@ -69,6 +69,38 @@ def populate_static_travel_time(timeslist, direction):
 
     connection.close()
 
+def query_static_time_table(origin, direction):
+    """
+    Takes an origin(eg, "G22") and direction ("N", or "S")
+    query_static_time_table("G29", "N")
+    output:
+    {'origin_id': 'G29', 'destination_id': 'G28', 'time': 180}
+    """
+
+    connection = sqlite3.connect("mtainfo.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    sql_north = """
+        SELECT origin_id, destination_id, time FROM origin_destination_times_north
+        WHERE origin_id = ?
+    """
+    sql_south = """
+        SELECT origin_id, destination_id, time FROM origin_destination_times_south
+        WHERE origin_id = ?
+    """
+    if direction == "N":
+        time_table = cursor.execute(sql_north, [origin,]).fetchone()
+    elif direction == "S":
+        time_table = cursor.execute(sql_south, [origin,]).fetchone()
+    connection.close()
+    if time_table is None:
+        return None
+    else:
+        return dict(time_table)
+
+
+
+
 if __name__ == "__main__":
     # build_static_travel_time_table_north()
     # build_static_travel_time_table_south()
