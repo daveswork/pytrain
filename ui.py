@@ -61,11 +61,20 @@ def station_lookup(station_id):
         return None
     
 def arriving_display(starting_point, direction, end_point, originating_time=None):
+        starting_postion = station_lookup(starting_point["station_id"])
+        destination_postion = station_lookup(end_point["station_id"])
+        number_of_stops = starting_postion - destination_postion
+        if number_of_stops < 0:
+            number_of_stops = number_of_stops * -1
         arriving_train = MTA.next_train_arrival(starting_point['station_id'], direction, originating_time)
         arriving_time = arriving_train['arrival_time']
         destination_time = MTA.get_arrival_time_for_destination(arriving_train, end_point['station_id'])['destination_arrival_time']
-        print(f"You train from {starting_point['stop_name']} will depart at {datetime.datetime.fromtimestamp(arriving_time).strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"To {end_point['stop_name']} and will arrive at {datetime.datetime.fromtimestamp(destination_time).strftime('%Y-%m-%d %H:%M:%S')}")
+        # print('You train from { :>30} will depart at \n {: >20}'.format(starting_point['stop_name'], datetime.datetime.fromtimestamp(arriving_time).strftime('%Y-%m-%d %H:%M:%S')))
+        # print('Your train to {:>22} will depart at {:>20}'.format(starting_point['stop_name'],datetime.datetime.fromtimestamp(arriving_time).strftime('%Y-%m-%d %H:%M:%S') ))
+        print(f"Departure time {datetime.datetime.fromtimestamp(arriving_time).strftime('%Y-%m-%d %H:%M:%S')} {starting_point['stop_name']}")
+        # print(f"To {end_point['stop_name']} and will arrive at \n {datetime.datetime.fromtimestamp(destination_time).strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"Arrival time   {datetime.datetime.fromtimestamp(destination_time).strftime('%Y-%m-%d %H:%M:%S')} {end_point['stop_name']}")
+        print(f'Number of stops: {number_of_stops}')
         trip_time = destination_time - arriving_time
         print(f'Total trip time is expected to be: {mta_output_formatting.convert_seconds(trip_time)}')
         return arriving_time
@@ -98,7 +107,7 @@ def new_trip(stations):
         print(f'You selected: {starting_point["stop_name"]}')
         print(f'Going: {direction}')
         arriving_train = MTA.next_train_arrival(starting_point['station_id'], direction)
-        print(f"Your train is arriving at {datetime.datetime.fromtimestamp(arriving_train['arrival_time']).strftime('%Y-%m-%d %H:%M:%S')}") 
+        print(f"Your train is arriving at \n {datetime.datetime.fromtimestamp(arriving_train['arrival_time']).strftime('%Y-%m-%d %H:%M:%S')}") 
 
 
 
