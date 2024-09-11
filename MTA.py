@@ -123,22 +123,26 @@ def get_vehicle_by_id(trip_id, line = "g"):
         elif entity.HasField("trip_update")  and len(entity.trip_update.stop_time_update) > 0 and entity.trip_update.trip.trip_id == trip_id:
             print(entity)
 
+# creates an array of stops with arrival times and departure times based on the last train in the entity feed
+# returns a list of dictionaries containing the origin stop, destination stop, and the time (arrival time - departure time)
 def get_stop_to_stop_times(direction, line = "g"):
+    # (stop_id, arrival_time, departure_time)
     stop_times = []
     stop_to_stop_times = []
     for stop_time in filter_direction(direction, line)[-1]["next_stops_array"]:
-        stop_and_time = (stop_time["stop_id"], stop_time["arrival_time"])
+        stop_and_time = (stop_time["stop_id"], stop_time["arrival_time"], stop_time["departure_time"])
         stop_times.append(stop_and_time)
     i = 0
     while i < len(stop_times) - 1:
         stop_time_dict = {
             "origin" : stop_times[i][0][:-1],
             "destination" : stop_times[i + 1][0][:-1],
-            "trip_time" : time_difference(stop_times[i][1], stop_times[i+1][1]) 
+            "trip_time" : time_difference(stop_times[i][2], stop_times[i+1][1]) 
         }
         stop_to_stop_times.append(stop_time_dict)
         i += 1
     return stop_to_stop_times
+    # return stop_times
 
 def is_train_slow(train_obj):
     trip_id = train_obj["train"]["trip_id"]
@@ -175,9 +179,11 @@ def get_all_trains(line = "g"):
             all_stops = []
             for stop in entity.trip_update.stop_time_update:
                 arrival_time = stop.arrival.time
+                departure_time = stop.departure.time
                 stop_id = stop.stop_id
                 stop_dict = {
                     "arrival_time" : arrival_time,
+                    "departure_time" : departure_time,
                     "stop_id": stop_id
                 }
                 all_stops.append(stop_dict)
@@ -195,10 +201,10 @@ def get_all_trains(line = "g"):
     return all_trains
 
 if __name__ == "__main__":
-    l_test = next_train_arrival("L02", "S",line = "l")
-    print(l_test)
+    # l_test = next_train_arrival("L02", "S",line = "l")
+    # print(choose_line("g").entity[-2])
    
-
+    print(get_stop_to_stop_times("S", "l"))
     # print(is_train_slow(train_test))
 
     # query_test = static_travel_times.query_static_time_table("G32", "N")
