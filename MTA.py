@@ -150,6 +150,8 @@ def is_train_slow(train_obj):
     last_station_arrival = train_obj["train"]["next_stops_array"][0]["arrival_time"]
     next_station_id = train_obj["train"]["next_stops_array"][1]["stop_id"]
     next_station_arrival = train_obj["train"]["next_stops_array"][1]["arrival_time"]
+    route_id = train_obj["train"]["route_id"].lower()
+    print(route_id)
     train_dict = {
         "trip_id" : trip_id,
         "origin" : last_station_id,
@@ -158,7 +160,7 @@ def is_train_slow(train_obj):
     }
     # print(train_dict)
     # print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
-    if static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1])["time"] < train_dict["trip_time"]:
+    if static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1], route_id)["time"] < train_dict["trip_time"]:
         return "Expect delays..."
     else:
         return "Train on time."
@@ -201,10 +203,12 @@ def get_all_trains(line = "g"):
     return all_trains
 
 if __name__ == "__main__":
-    # l_test = next_train_arrival("L02", "S",line = "l")
-    # print(choose_line("g").entity[-2])
+    l_test = next_train_arrival("G22", "S",line = "g")
+    dest_test = get_arrival_time_for_destination(l_test, "L10")
+    # print(dest_test)
    
-    print(get_stop_to_stop_times("S", "l"))
+    print(is_train_slow(l_test))
+    # print(get_stop_to_stop_times("S", "l"))
     # print(is_train_slow(train_test))
 
     # query_test = static_travel_times.query_static_time_table("G32", "N")
