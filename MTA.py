@@ -64,7 +64,7 @@ def next_train_arrival(station, direction):
         # time difference subtracts the arrival time (future) from the current time, and returns a delta time in seconds.
         # the smallest time will be filtered and set to min_time.
         # the train with the lowest min time will have its data (arrival time, train obj) set to the best_time and best_train variables
-        if time_difference(ct_epoch, arrival_time) < min_time:
+        if time_difference(ct_epoch, arrival_time) < min_time and time_difference(ct_epoch, arrival_time) > 0:
             min_time = time_difference(ct_epoch, arrival_time)
             best_time = arrival_time
             best_train = train
