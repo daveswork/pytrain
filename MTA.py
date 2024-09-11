@@ -9,12 +9,17 @@ import static_travel_times
 # this is the API request that is used to get realtime train data in GTFS format.
 # the url endpoint specifies an individual train line.
 # feed contains the info we use in the program
-feed = gtfs_realtime_pb2.FeedMessage()
-response = requests.get('https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g')
-feed.ParseFromString(response.content)
-
+# feed = gtfs_realtime_pb2.FeedMessage()
+# response = requests.get('https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l')
+# feed.ParseFromString(response.content)
 # current time
 ct = datetime.now()
+
+def choose_line(line):
+    feed = gtfs_realtime_pb2.FeedMessage()
+    response = requests.get(f'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-{line}')
+    feed.ParseFromString(response.content)
+    return feed
 
 # convert 10 digit POSIX timestamp used in feed to readable format
 def convert_timestamp(timestamp):
@@ -25,10 +30,10 @@ def convert_seconds(seconds):
     return timedelta(seconds = seconds)
 
 # returns a list of all trains traveling either N or S
-def filter_direction(direction):
+def filter_direction(direction, line = "g"):
     filtered_trains = []
     # loops throught the feed and appends trains to filtered_trains list if they are going in the specified direction 
-    for train in get_all_trains():
+    for train in get_all_trains(line):
         if train["direction"] == direction:
             filtered_trains.append(train)
     return filtered_trains
@@ -45,7 +50,7 @@ def filter_stations(station, train_list):
 
 # MAIN FUNCTION 
 # Returns a dict that contains info on the next train arriving at the specified station. Takes station and direction as args.
-def next_train_arrival(station, direction, future_time = None):
+def next_train_arrival(station, direction, future_time = None, line = "g"):
     direction_bound_trains = []
     if future_time is None:
         ct_epoch = int(ct.timestamp())
@@ -56,7 +61,7 @@ def next_train_arrival(station, direction, future_time = None):
     best_train = {}
 
 # loop through all_trains list returned from get_trains_function and appends trains traveling in the selected direction to direction_bound_trains
-    for train in filter_direction(direction):
+    for train in filter_direction(direction, line):
         direction_bound_trains.append(train)
 # next_train_list contains every train that will stop at the chosen station. It is created using the list of direction bound trains that has been filtered for direction. 
     next_train_list = filter_stations(station, direction_bound_trains)
@@ -103,13 +108,15 @@ def get_arrival_time_for_destination(train_obj, end_station):
 
 # this function takes a train at the end of the feed from the MTA and uses it's stop array to build an ordered route of stops.
 #  trains that have not embarked on their routes are located at the end of the feed, and have the entire route contained in their stop array.
-def get_stop_sequence():
+def get_stop_sequence(line = "g"):
     stops = []
+    feed = choose_line(line)
     for stop in feed.entity[-2].trip_update.stop_time_update:
         stops.append(stop.stop_id)
     return stops
 
-def get_vehicle_by_id(trip_id):
+def get_vehicle_by_id(trip_id, line = "g"):
+    feed = choose_line(line)
     for entity in feed.entity:
         if entity.HasField("vehicle") and entity.vehicle.trip.trip_id == trip_id:
             print("V", entity)
@@ -155,8 +162,9 @@ def is_train_slow(train_obj):
 # this function takes the GTFS feed from the request and returns a list of train objects that will be used in all of our functions.
 # each train is called an entity, and if that entity has a 'trip_update" key and an array of stops, then it will contain the information that our program uses.
 # entities that don't contain this info will be ignored.
-def get_all_trains():
+def get_all_trains(line = "g"):
     all_trains = []
+    feed = choose_line(line)
     for entity in feed.entity:
         if entity.HasField('trip_update') and len(entity.trip_update.stop_time_update) >= 1:
             trip_id = entity.trip_update.trip.trip_id
@@ -187,12 +195,11 @@ def get_all_trains():
     return all_trains
 
 if __name__ == "__main__":
-    train_test = next_train_arrival("G36", "S")
-    print(train_test["train"])
-    # print(feed.entity[-2])
+    l_test = next_train_arrival("L02", "S",line = "l")
+    print(l_test)
    
 
-    print(is_train_slow(next_train_arrival("G36", "S")))
+    # print(is_train_slow(train_test))
 
     # query_test = static_travel_times.query_static_time_table("G32", "N")
     # print(query_test)
