@@ -76,9 +76,8 @@ def next_train_arrival(station, direction):
     }
 
 # loop through the next_stops_array of a train object and return the arrival time for the stop that matches the stop_id (station)
-# the first stop of the array is excluded because the train has already departed. 
 def get_arrival_time_for_station(train, station):
-    for stop in train["next_stops_array"][1:]:
+    for stop in train["next_stops_array"]:
         if stop["stop_id"][:-1] == station:
             return stop["arrival_time"]
 
@@ -160,8 +159,7 @@ def get_all_trains():
             trip_id = entity.trip_update.trip.trip_id
             route_id = entity.trip_update.trip.route_id
             start_time = entity.trip_update.trip.start_time
-            next_arrival = entity.trip_update.stop_time_update[1].arrival.time
-            next_station = entity.trip_update.stop_time_update[1].stop_id
+            last_station = entity.trip_update.stop_time_update[0].stop_id
             all_stops = []
             for stop in entity.trip_update.stop_time_update:
                 arrival_time = stop.arrival.time
@@ -175,10 +173,8 @@ def get_all_trains():
             train_dict ={
                 "trip_id" : trip_id,
                 "route_id" : route_id,
-                "direction" : next_station[-1],
+                "direction" : last_station[-1],
                 "start_time" : start_time,
-                "next_stop_id" : next_station,
-                "next_stop_arrival" : next_arrival,
                 "next_stops_array" : all_stops
             }
             all_trains.append(train_dict)
@@ -186,7 +182,7 @@ def get_all_trains():
 
 if __name__ == "__main__":
     train_test = next_train_arrival("G36", "S")
-
+    print(train_test)
     # print(feed.entity[-2])
    
 
