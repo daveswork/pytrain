@@ -7,8 +7,6 @@ import sqlite3
 import time
 import pprint
 
-
-
 def select_a_stop(stations):
     """
     Select a stop prompt and selection menu. 
@@ -62,33 +60,20 @@ def station_lookup(station_id):
     else:
         return None
     
-def countdown_to_time(seconds):
+def arriving_display(starting_point, direction, end_point, originating_time=None):
+        arriving_train = MTA.next_train_arrival(starting_point['station_id'], direction, originating_time)
+        arriving_time = arriving_train['arrival_time']
+        destination_time = MTA.get_arrival_time_for_destination(arriving_train, end_point['station_id'])['destination_arrival_time']
+        print(f"You train from {starting_point['stop_name']} will depart at {datetime.datetime.fromtimestamp(arriving_time).strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"To {end_point['stop_name']} and will arrive at {datetime.datetime.fromtimestamp(destination_time).strftime('%Y-%m-%d %H:%M:%S')}")
+        trip_time = destination_time - arriving_time
+        print(f'Total trip time is expected to be: {mta_output_formatting.convert_seconds(trip_time)}')
+        return arriving_time
 
-    t = seconds
-
-    while t:
-        mins, secs = divmod(t, 60)
-        timer = '{:02d}:{:02d}'.format(mins, secs) 
-        print(timer, end="\r")
-        time.sleep(1)
-        t -= 1
-    
-    print("Train has arrived!")
-
-
-
-
-if __name__ == "__main__":
-
-    stations = csv_to_db.get_stations_id_and_name()
-
+def new_trip(stations):
     starting_point = select_a_stop(stations)
-    end_point = None
     print(f'You selected: {starting_point["stop_name"]}')
     add_stop = input("Do you want to add a stop? Y/n: ")
-
-    # 1725907267
-    # countdown_to_time(90)
 
     if add_stop.upper() == "Y":
         end_point = select_a_stop(stations)
@@ -102,19 +87,31 @@ if __name__ == "__main__":
         else:
             direction = "N"
         print(f'Going: {direction}')
-        arriving_train = MTA.next_train_arrival(starting_point['station_id'], direction)
-        arriving_time = arriving_train['arrival_time']
-        destination_time = MTA.get_arrival_time_for_destination(arriving_train, end_point['station_id'])['destination_arrival_time']
-        print(f"You train from {starting_point['stop_name']} will depart at {datetime.datetime.fromtimestamp(arriving_time).strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"To {end_point['stop_name']} and will arrive at {datetime.datetime.fromtimestamp(destination_time).strftime('%Y-%m-%d %H:%M:%S')}")
-        trip_time = destination_time - arriving_time
-        print(f'Total trip time is expected to be: {mta_output_formatting.convert_seconds(trip_time)}')
-        print('Your train will depart in:')
-        countdown_to_time(arriving_time - int(datetime.datetime.now().timestamp()))
+        new_arriving_time = arriving_display(starting_point, direction, end_point)
+
+        next_train = input("Do you want to get the next train? (Y/n): ").upper()
+        while next_train == "Y":
+            new_arriving_time = arriving_display(starting_point, direction, end_point, new_arriving_time)
+            next_train = input("Do you want to get the next train? (Y/n): ").upper()
     else:
         direction = select_a_direction()
         print(f'You selected: {starting_point["stop_name"]}')
         print(f'Going: {direction}')
         arriving_train = MTA.next_train_arrival(starting_point['station_id'], direction)
-        print(f"Your train is arriving at {datetime.datetime.fromtimestamp(arriving_train['arrival_time']).strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"Your train is arriving at {datetime.datetime.fromtimestamp(arriving_train['arrival_time']).strftime('%Y-%m-%d %H:%M:%S')}") 
+
+
+
+
+
+
+if __name__ == "__main__":
+
+    stations = csv_to_db.get_stations_id_and_name()
+    end_point = None
+    new_trip(stations)
+    another_trip = input("Do you want schedule another trip (Y/n): ").upper()
+    while another_trip == "Y":
+        new_trip(stations)
+        another_trip = input("Do you want schedule another trip (Y/n): ").upper()
     
