@@ -123,10 +123,10 @@ def get_vehicle_by_id(trip_id, line = "g"):
         elif entity.HasField("trip_update")  and len(entity.trip_update.stop_time_update) > 0 and entity.trip_update.trip.trip_id == trip_id:
             print(entity)
 
-def get_stop_to_stop_times(direction):
+def get_stop_to_stop_times(direction, line = "g"):
     stop_times = []
     stop_to_stop_times = []
-    for stop_time in filter_direction(direction)[-1]["next_stops_array"]:
+    for stop_time in filter_direction(direction, line)[-1]["next_stops_array"]:
         stop_and_time = (stop_time["stop_id"], stop_time["arrival_time"])
         stop_times.append(stop_and_time)
     i = 0
