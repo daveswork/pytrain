@@ -55,7 +55,7 @@ def next_train_arrival(station, direction):
 # loop through all_trains list returned from get_trains_function and appends trains traveling in the selected direction to direction_bound_trains
     for train in filter_direction(direction):
         direction_bound_trains.append(train)
-# next_train_list contains every train that will stop at the chosen station. It is created using the list of direction bound trains that has been filtered for direction.
+# next_train_list contains every train that will stop at the chosen station. It is created using the list of direction bound trains that has been filtered for direction. 
     next_train_list = filter_stations(station, direction_bound_trains)
 # loop through each train in next train list, find the train with arrival time closest to current time, and return that train, the arrival time, and the seconds to arrival, in dict (best_train)
     for train in next_train_list:
@@ -76,8 +76,9 @@ def next_train_arrival(station, direction):
     }
 
 # loop through the next_stops_array of a train object and return the arrival time for the stop that matches the stop_id (station)
+# the first stop of the array is excluded because the train has already departed. 
 def get_arrival_time_for_station(train, station):
-    for stop in train["next_stops_array"]:
+    for stop in train["next_stops_array"][1:]:
         if stop["stop_id"][:-1] == station:
             return stop["arrival_time"]
 
@@ -116,14 +117,10 @@ def get_vehicle_by_id(trip_id):
 def get_stop_to_stop_times(direction):
     stop_times = []
     stop_to_stop_times = []
-    # stop_to_stop_times.append({feed.entity[-2].trip_update.trip.trip_id})
-    # print(feed.entity[-2])
     for stop_time in filter_direction(direction)[-1]["next_stops_array"]:
-        # print(stop_time)
         stop_and_time = (stop_time["stop_id"], stop_time["arrival_time"])
         stop_times.append(stop_and_time)
     i = 0
-    # print(stop_times)
     while i < len(stop_times) - 1:
         stop_time_dict = {
             "origin" : stop_times[i][0][:-1],
@@ -159,12 +156,12 @@ def is_train_slow(train_obj):
 def get_all_trains():
     all_trains = []
     for entity in feed.entity:
-        if entity.HasField('trip_update') and len(entity.trip_update.stop_time_update) > 0:
+        if entity.HasField('trip_update') and len(entity.trip_update.stop_time_update) >= 1:
             trip_id = entity.trip_update.trip.trip_id
             route_id = entity.trip_update.trip.route_id
             start_time = entity.trip_update.trip.start_time
-            next_arrival = entity.trip_update.stop_time_update[0].arrival.time
-            next_station = entity.trip_update.stop_time_update[0].stop_id
+            next_arrival = entity.trip_update.stop_time_update[1].arrival.time
+            next_station = entity.trip_update.stop_time_update[1].stop_id
             all_stops = []
             for stop in entity.trip_update.stop_time_update:
                 arrival_time = stop.arrival.time
