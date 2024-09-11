@@ -7,6 +7,7 @@ name = "pypi"
 simple-term-menu = "*"
 gtfs-realtime-bindings = "*"
 requests = "*"
+nyct-gtfs = "*"
 
 [dev-packages]
 

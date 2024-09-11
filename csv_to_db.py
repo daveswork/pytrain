@@ -129,22 +129,55 @@ def mta_subway_station_query(stop_id):
         return station
     return dict(station)
 
-def mta_select_stop():
+def get_stations_id_and_name():
+    """
+    Input: None
+    Returns a list of tuples with station names and ids
+    Output:
+    [('Court Sq', 'G22'),
+    ('21 St', 'G24'),
+    ('Greenpoint Av', 'G26'),
+    ('Nassau Av', 'G28'),
+    ('Metropolitan Av', 'G29'),
+    ('Broadway', 'G30'),
+    ('Flushing Av', 'G31'),
+    ('Myrtle-Willoughby Avs', 'G32'),
+    ('Bedford-Nostrand Avs', 'G33'),
+    ('Classon Av', 'G34'),
+    ('Clinton-Washington Avs', 'G35'),
+    ('Fulton St', 'G36'),
+    ('Hoyt-Schermerhorn Sts', 'A42'),
+    ('Bergen St', 'F20'),
+    ('Carroll St', 'F21'),
+    ('Smith-9 Sts', 'F22'),
+    ('4 Av-9 St', 'F23'),
+    ('7 Av', 'F24'),
+    ('15 St-Prospect Park', 'F25'),
+    ('Fort Hamilton Pkwy', 'F26'),
+    ('Church Av', 'F27')]
+
+    """
+    connection = sqlite3.connect("mtainfo.db")
+    cursor = connection.cursor()
+    sql = """
+        SELECT stop_name, stop_id FROM groute
+        """
+    stations = cursor.execute(sql).fetchall()
+    connection.close()
+    return stations[::-1]
+
+
+
+def mta_select_stop(stations):
     """
     Select a stop prompt and selection menu. 
     Returns a dictionary containing the station id and stop name.
     eg:
     {'station_id': 'G29', 'stop_name': 'Metropolitan Av'}
     """
-    connection = sqlite3.connect("mtainfo.db")
-    cursor = connection.cursor()
-    sql = """
-        SELECT stop_name, gtfs_stop_id FROM mtainfo WHERE daytime_routes LIKE "%G%"
-        """
-    stations = cursor.execute(sql).fetchall()
+
     options = [station[0] for station in stations]
-    connection.close()
-    terminal_menu = TerminalMenu(options)
+    terminal_menu = TerminalMenu(options, title="Select a stop:")
     menu_entry_index = terminal_menu.show()
     return {"station_id": stations[menu_entry_index][1], "stop_name": options[menu_entry_index]}
     

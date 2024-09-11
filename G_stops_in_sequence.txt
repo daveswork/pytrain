@@ -1,0 +1,21 @@
+G22S Court Sq
+G24S 21 St
+G26S Greenpoint Av
+G28S Nassau Av
+G29S Metropolitan Av
+G30S Broadway
+G31S Flushing Av
+G32S Myrtle-Willoughby Avs
+G33S Bedford-Nostrand Avs
+G34S Classon Av
+G35S Clinton-Washington Avs
+G36S Fulton St
+A42S Hoyt-Schermerhorn Sts
+F20S Bergen St
+F21S Carroll St
+F22S Smith-9 Sts
+F23S 4 Av-9 St
+F24S 7 Av
+F25S 15 St-Prospect Park
+F26S Fort Hamilton Pkwy
+F27S Church Av

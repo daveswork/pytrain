@@ -17,6 +17,14 @@ def convert_seconds(seconds):
     """
     Takes number of seconds, as integers.
     Returns formatted time.
+    Input: int (number of seconds)
+    Sample output:
+    >>> mta_output_formatting.convert_seconds(600)
+    datetime.timedelta(seconds=600)
+    >>> print(mta_output_formatting.convert_seconds(600))
+    0:10:00
+    >>> 
+
     """
     return timedelta(seconds=seconds)
 
