@@ -45,9 +45,12 @@ def filter_stations(station, train_list):
 
 # MAIN FUNCTION 
 # Returns a dict that contains info on the next train arriving at the specified station. Takes station and direction as args.
-def next_train_arrival(station, direction):
+def next_train_arrival(station, direction, future_time = None):
     direction_bound_trains = []
-    ct_epoch = int(ct.timestamp())
+    if future_time is None:
+        ct_epoch = int(ct.timestamp())
+    else:
+        ct_epoch = future_time
     min_time = 3600
     best_time = 0
     best_train = {}
