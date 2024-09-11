@@ -4,6 +4,7 @@ import datetime
 from simple_term_menu import TerminalMenu
 import mta_output_formatting
 import sqlite3
+import time
 import pprint
 
 
@@ -60,6 +61,21 @@ def station_lookup(station_id):
         return postion[0]
     else:
         return None
+    
+def countdown_to_time(seconds):
+
+    t = seconds
+
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs) 
+        print(timer, end="\r")
+        time.sleep(1)
+        t -= 1
+    
+    print("Train has arrived!")
+
+
 
 
 if __name__ == "__main__":
@@ -72,6 +88,7 @@ if __name__ == "__main__":
     add_stop = input("Do you want to add a stop? Y/n: ")
 
     # 1725907267
+    # countdown_to_time(90)
 
     if add_stop.upper() == "Y":
         end_point = select_a_stop(stations)
@@ -92,6 +109,8 @@ if __name__ == "__main__":
         print(f"To {end_point['stop_name']} and will arrive at {datetime.datetime.fromtimestamp(destination_time).strftime('%Y-%m-%d %H:%M:%S')}")
         trip_time = destination_time - arriving_time
         print(f'Total trip time is expected to be: {mta_output_formatting.convert_seconds(trip_time)}')
+        print('Your train will depart in:')
+        countdown_to_time(arriving_time - int(datetime.datetime.now().timestamp()))
     else:
         direction = select_a_direction()
         print(f'You selected: {starting_point["stop_name"]}')
