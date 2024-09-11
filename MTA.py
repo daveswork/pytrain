@@ -86,8 +86,10 @@ def next_train_arrival(station, direction, future_time = None, line = "g"):
 # loop through the next_stops_array of a train object and return the arrival time for the stop that matches the stop_id (station)
 def get_arrival_time_for_station(train, station):
     for stop in train["next_stops_array"]:
-        if stop["stop_id"][:-1] == station:
+        if stop["stop_id"][:-1] == station and stop["arrival_time"] is not None:
             return stop["arrival_time"]
+        else:
+            return stop["departure_time"]
 
 # this function takes the train object returned from the next_train_arrival function as a first argument and a destination station as its second argument.
 # it returns the train object it took as the first argument, but with a 'destination_arrival_time' key value pair added. 
@@ -151,15 +153,15 @@ def is_train_slow(train_obj):
     next_station_id = train_obj["train"]["next_stops_array"][1]["stop_id"]
     next_station_arrival = train_obj["train"]["next_stops_array"][1]["arrival_time"]
     route_id = train_obj["train"]["route_id"].lower()
-    print(route_id)
     train_dict = {
         "trip_id" : trip_id,
         "origin" : last_station_id,
         "destination" : next_station_id,
         "trip_time" : time_difference(last_station_arrival, next_station_arrival)
     }
-    # print(train_dict)
-    # print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
+    print(train_dict)
+    print(last_station_id)
+    print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
     if static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1], route_id)["time"] < train_dict["trip_time"]:
         return "Expect delays..."
     else:
@@ -203,11 +205,13 @@ def get_all_trains(line = "g"):
     return all_trains
 
 if __name__ == "__main__":
-    l_test = next_train_arrival("G22", "S",line = "g")
-    dest_test = get_arrival_time_for_destination(l_test, "L10")
-    # print(dest_test)
+    g_test = next_train_arrival("G35", "N",line = "g")
+    print(g_test)
+    # print(get_arrival_time_for_destination(g_test, "G22"))
+    # dest_test = get_arrival_time_for_destination(g_test, "F27")
+    # print(l_test["train"]["trip_id"])
    
-    print(is_train_slow(l_test))
+    # print(is_train_slow(l_test))
     # print(get_stop_to_stop_times("S", "l"))
     # print(is_train_slow(train_test))
 
