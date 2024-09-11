@@ -145,12 +145,12 @@ def is_train_slow(train_obj):
         "destination" : next_station_id,
         "trip_time" : time_difference(last_station_arrival, next_station_arrival)
     }
-    print(train_dict)
-    print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
+    # print(train_dict)
+    # print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
     if static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1])["time"] < train_dict["trip_time"]:
-        print("your train is slow")
+        return "Expect delays..."
     else:
-        print("train on time")
+        return "Train on time."
 
 # this function takes the GTFS feed from the request and returns a list of train objects that will be used in all of our functions.
 # each train is called an entity, and if that entity has a 'trip_update" key and an array of stops, then it will contain the information that our program uses.
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     # print(feed.entity[-2])
    
 
-    is_train_slow(next_train_arrival("G36", "S"))
+    print(is_train_slow(next_train_arrival("G36", "S")))
 
     # query_test = static_travel_times.query_static_time_table("G32", "N")
     # print(query_test)
