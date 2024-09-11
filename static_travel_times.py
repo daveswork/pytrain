@@ -31,6 +31,23 @@ def build_static_travel_time_table_south():
     connection.commit()
     connection.close()
 
+def build_static_travel_time_table_all():
+    connection = sqlite3.connect("mtainfo.db")
+    cursor = connection.cursor()
+    create_table_sql = """
+    CREATE TABLE IF NOT EXISTS origin_destination_times_all(
+    id INTEGER PRIMARY KEY,
+    line TEXT,
+    direction TEXT,
+    origin_id TEXT,
+    destination_id TEXT,
+    time INT
+    )
+    """
+    cursor.execute(create_table_sql)
+    connection.commit()
+    connection.close()
+
 
 def populate_static_travel_time(timeslist, direction):
     """
@@ -69,7 +86,7 @@ def populate_static_travel_time(timeslist, direction):
 
     connection.close()
 
-def query_static_time_table(origin, direction):
+def query_static_time_table(origin, direction, line="g"):
     """
     Takes an origin(eg, "G22") and direction ("N", or "S")
     query_static_time_table("G29", "N")
@@ -80,23 +97,26 @@ def query_static_time_table(origin, direction):
     connection = sqlite3.connect("mtainfo.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    sql_north = """
-        SELECT origin_id, destination_id, time FROM origin_destination_times_north
-        WHERE origin_id = ?
-    """
-    sql_south = """
-        SELECT origin_id, destination_id, time FROM origin_destination_times_south
-        WHERE origin_id = ?
-    """
-    if direction == "N":
-        time_table = cursor.execute(sql_north, [origin,]).fetchone()
-    elif direction == "S":
-        time_table = cursor.execute(sql_south, [origin,]).fetchone()
-    connection.close()
-    if time_table is None:
-        return None
+    if line == "g":
+        sql_north = """
+            SELECT origin_id, destination_id, time FROM origin_destination_times_north
+            WHERE origin_id = ?
+        """
+        sql_south = """
+            SELECT origin_id, destination_id, time FROM origin_destination_times_south
+            WHERE origin_id = ?
+        """
+        if direction == "N":
+            time_table = cursor.execute(sql_north, [origin,]).fetchone()
+        elif direction == "S":
+            time_table = cursor.execute(sql_south, [origin,]).fetchone()
+        connection.close()
+        if time_table is None:
+            return None
+        else:
+            return dict(time_table)
     else:
-        return dict(time_table)
+        pass
 
 
 
@@ -105,5 +125,6 @@ if __name__ == "__main__":
     # build_static_travel_time_table_north()
     # build_static_travel_time_table_south()
     # populate_static_travel_time(MTA.get_stop_to_stop_times("S"), "S")
-
+    # build_static_travel_time_table_all()
     pass
+
