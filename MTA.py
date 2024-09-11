@@ -160,6 +160,7 @@ def get_all_trains():
             route_id = entity.trip_update.trip.route_id
             start_time = entity.trip_update.trip.start_time
             last_station = entity.trip_update.stop_time_update[0].stop_id
+            last_station_departure = entity.trip_update.stop_time_update[0].departure.time
             all_stops = []
             for stop in entity.trip_update.stop_time_update:
                 arrival_time = stop.arrival.time
@@ -175,6 +176,8 @@ def get_all_trains():
                 "route_id" : route_id,
                 "direction" : last_station[-1],
                 "start_time" : start_time,
+                "last_station" : last_station,
+                "last_station_departure" : str(convert_timestamp(last_station_departure)),
                 "next_stops_array" : all_stops
             }
             all_trains.append(train_dict)
