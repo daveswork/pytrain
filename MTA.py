@@ -145,8 +145,8 @@ def is_train_slow(train_obj):
         "destination" : next_station_id,
         "trip_time" : time_difference(last_station_arrival, next_station_arrival)
     }
-    print(train_dict)
-    print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
+    # print(train_dict)
+    # print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
     if static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1])["time"] < train_dict["trip_time"]:
         return "Expect delays..."
     else:
@@ -188,7 +188,7 @@ def get_all_trains():
 
 if __name__ == "__main__":
     train_test = next_train_arrival("G36", "S")
-    print(train_test)
+    print(train_test["train"])
     # print(feed.entity[-2])
    
 
