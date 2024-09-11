@@ -74,7 +74,7 @@ def station_lookup(station_id, line):
     else:
         return None
     
-def arriving_display(starting_point, direction, end_point, line="g",originating_time=None):
+def arriving_display(starting_point, direction, end_point,originating_time=None, line= "g"):
         """
         Takes the following inputs:
         starting_point = dict (eg {'station_id': 'G29', 'stop_name': 'Metropolitan Av'})
@@ -89,6 +89,7 @@ def arriving_display(starting_point, direction, end_point, line="g",originating_
         number_of_stops = starting_postion - destination_postion
         if number_of_stops < 0:
             number_of_stops = number_of_stops * -1
+        print("Originating time:", originating_time)
         arriving_train = MTA.next_train_arrival(starting_point['station_id'], direction, originating_time, line=line)
         arriving_time = arriving_train['arrival_time']
         destination_time = MTA.get_arrival_time_for_destination(arriving_train, end_point['station_id'])['destination_arrival_time']
@@ -133,11 +134,11 @@ def new_trip(stations, line):
         else:
             direction = "N"
         print(f'Going: {direction}')
-        new_arriving_time = arriving_display(starting_point, direction, end_point, line)
+        new_arriving_time = arriving_display(starting_point, direction, end_point, line=line)
 
         next_train = input("Do you want to get the next train? (Y/n): ").upper()
         while next_train == "Y":
-            new_arriving_time = arriving_display(starting_point, direction, end_point, new_arriving_time, line)
+            new_arriving_time = arriving_display(starting_point, direction, end_point, new_arriving_time, line=line)
             next_train = input("Do you want to get the next train? (Y/n): ").upper()
     else:
         direction = select_a_direction()
