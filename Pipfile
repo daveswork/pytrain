@@ -8,6 +8,7 @@ simple-term-menu = "*"
 gtfs-realtime-bindings = "*"
 requests = "*"
 nyct-gtfs = "*"
+ipdb = "*"
 
 [dev-packages]
 

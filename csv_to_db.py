@@ -129,7 +129,7 @@ def mta_subway_station_query(stop_id):
         return station
     return dict(station)
 
-def get_stations_id_and_name():
+def get_stations_id_and_name(line):
     """
     Input: None
     Returns a list of tuples with station names and ids
@@ -159,8 +159,13 @@ def get_stations_id_and_name():
     """
     connection = sqlite3.connect("mtainfo.db")
     cursor = connection.cursor()
-    sql = """
-        SELECT stop_name, stop_id FROM groute
+    if line == "g":
+            sql = """
+            SELECT stop_name, stop_id FROM groute
+            """
+    elif line == "l":
+        sql = """
+            SELECT stop_name, stop_id FROM lroute
         """
     stations = cursor.execute(sql).fetchall()
     connection.close()
