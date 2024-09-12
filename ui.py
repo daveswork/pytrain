@@ -11,7 +11,9 @@ import pprint
 
 
 ascii_art = [train_ascii.metrocard, train_ascii.train, train_ascii.small_train, \
-             train_ascii.pt_logo1, train_ascii.pt_logo2, train_ascii.pt_logo3]
+             train_ascii.pt_logo1, train_ascii.pt_logo2, train_ascii.pt_logo3, \
+             train_ascii.pt_logo4, train_ascii.pt_logo5,train_ascii.skyline_1, \
+             train_ascii.skyline_2 ]
 
 def logos():
     print(ascii_art[random.randint(0, len(ascii_art)-1)])
