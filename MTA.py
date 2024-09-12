@@ -5,6 +5,7 @@ from mta_output_formatting import time_difference, convert_seconds
 import pprint
 import csv_to_db 
 import static_travel_times
+import ipdb 
 
 # this is the API request that is used to get realtime train data in GTFS format.
 # the url endpoint specifies an individual train line.
@@ -46,11 +47,15 @@ def filter_stations(station, train_list):
         for stop in train["next_stops_array"]:
             if stop["stop_id"][:-1] == station:
                 filtered_stations.append(train)
+    # for train in filtered_stations:
+    #     pprint.pprint(train)
     return filtered_stations
 
 # MAIN FUNCTION 
 # Returns a dict that contains info on the next train arriving at the specified station. Takes station and direction as args.
+
 def next_train_arrival(station, direction, future_time = None, line = "g"):
+    
     direction_bound_trains = []
     if future_time is None:
         ct_epoch = int(ct.timestamp())
@@ -59,7 +64,7 @@ def next_train_arrival(station, direction, future_time = None, line = "g"):
     min_time = 3600
     best_time = 0
     best_train = {}
-
+    
 # loop through all_trains list returned from get_trains_function and appends trains traveling in the selected direction to direction_bound_trains
     for train in filter_direction(direction, line):
         direction_bound_trains.append(train)
@@ -69,26 +74,31 @@ def next_train_arrival(station, direction, future_time = None, line = "g"):
     for train in next_train_list:
         # arrival_time finds the station in each train's next_stops_array and returns the arrival time for the station
         arrival_time = get_arrival_time_for_station(train, station)
+        # pprint.pprint("at", arrival_time)
         # time difference subtracts the arrival time (future) from the current time, and returns a delta time in seconds.
         # the smallest time will be filtered and set to min_time.
         # the train with the lowest min time will have its data (arrival time, train obj) set to the best_time and best_train variables
         if time_difference(ct_epoch, arrival_time) < min_time and time_difference(ct_epoch, arrival_time) > 0:
+            
             min_time = time_difference(ct_epoch, arrival_time)
             best_time = arrival_time
             best_train = train
     # the function returns a dict containing the entire train obj(best_train), as well as arrival time for the station, and seconds to arrival.
+    # print("bt", best_time)
+    # pprint.pprint(best_train)
     return {
         "train" : best_train,
         "arrival_time" : best_time,
         "arriving_in" : time_difference(ct_epoch, best_time)
     }
 
+
 # loop through the next_stops_array of a train object and return the arrival time for the stop that matches the stop_id (station)
 def get_arrival_time_for_station(train, station):
     for stop in train["next_stops_array"]:
-        if stop["stop_id"][:-1] == station and stop["arrival_time"] is not None:
+        if stop["stop_id"][:-1] == station and stop["arrival_time"] > 0:
             return stop["arrival_time"]
-        else:
+        elif stop["stop_id"][:-1] == station:
             return stop["departure_time"]
 
 # this function takes the train object returned from the next_train_arrival function as a first argument and a destination station as its second argument.
@@ -159,9 +169,9 @@ def is_train_slow(train_obj):
         "destination" : next_station_id,
         "trip_time" : time_difference(last_station_arrival, next_station_arrival)
     }
-    print(train_dict)
-    print(last_station_id)
-    print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
+    # print(train_dict)
+    # print(last_station_id)
+    # print(static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1]))
     if static_travel_times.query_static_time_table(last_station_id[:-1], last_station_id[-1], route_id)["time"] < train_dict["trip_time"]:
         return "Expect delays..."
     else:
@@ -174,7 +184,7 @@ def get_all_trains(line = "g"):
     all_trains = []
     feed = choose_line(line)
     for entity in feed.entity:
-        if entity.HasField('trip_update') and len(entity.trip_update.stop_time_update) >= 1:
+        if entity.HasField('trip_update') and len(entity.trip_update.stop_time_update) > 0:
             trip_id = entity.trip_update.trip.trip_id
             route_id = entity.trip_update.trip.route_id
             start_time = entity.trip_update.trip.start_time
@@ -205,9 +215,18 @@ def get_all_trains(line = "g"):
     return all_trains
 
 if __name__ == "__main__":
-    g_test = next_train_arrival("G35", "N",line = "g")
-    print(g_test)
-    # print(get_arrival_time_for_destination(g_test, "G22"))
+    pass
+    # ipdb.set_trace()
+    # g_test = next_train_arrival("G35", "S",line = "g")
+    # pprint.pprint(l_test)
+    # pprint.pprint(get_arrival_time_for_destination(g_test, "F27"))
+
+    # l_test = next_train_arrival("L17", "S",line = "l")
+    # pprint.pprint(l_test)
+    # pprint.pprint(get_arrival_time_for_destination(l_test, "L01"))
+    
+
+    # pprint.pprint(choose_line("g"))
     # dest_test = get_arrival_time_for_destination(g_test, "F27")
     # print(l_test["train"]["trip_id"])
    
